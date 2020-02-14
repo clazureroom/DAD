@@ -194,6 +194,7 @@
                 "displayName": "cache"
             },
             "properties": {
+                "enableNonSslPort": true,
                 "sku": {
                     "name": "[parameters('cacheSKUName')]",
                     "family": "[parameters('cacheSKUFamily')]",
@@ -231,7 +232,7 @@
                     "name": "[concat(variables('pgserverName'),'firewall')]",
                     "properties": {
                         "startIpAddress": "0.0.0.0",
-                        "endIpAddress": "255.255.255.255"
+                        "endIpAddress": "0.0.0.0"
                     }
                 }
             ]
@@ -247,14 +248,14 @@
                 "capacity": "[parameters('skuCapacity')]"
             },
             "properties": {
+                "reserved": true
             }
         },
         {
-            "name": "webapp-auto-deploy",
+            "name": "webapp-auto-deploy-001",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
             "location": "UK South",
-            "kind": "app,linux,container",
             "dependsOn": [
                 "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
                 "[concat('Microsoft.Cache/Redis/', variables('cacheName'))]",
@@ -279,22 +280,31 @@
                         {
                             "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                             "value": "false"
+                        },
+                        {
+                            "name": "REDIS_URL",
+                            "value": "[concat('redis://h:', uriComponent(listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').SecondaryKey), '@', variables('cacheName'),'.redis.cache.windows.net:6379')]"
+                        },
+                        {
+                            "name": "REDIS_PROVIDER",
+                            "value": "REDIS_URL"
+                        },
+                        {
+                            "name": "USE_CACHING",
+                            "value": "false"
+                        },
+                        {
+                            "name": "WEBSITES_PORT",
+                            "value": "3000"
+                        },
+                        {
+                            "name": "DATABASE_URL",
+                            "value": "[concat('postgres://',uriComponent(concat(parameters('administratorLogin'), '@', variables('pgserverName'))),':', parameters('administratorLoginPassword'),'@', reference(concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))).fullyQualifiedDomainName,':5432/postgres')]"
                         }
                     ],
                     "linuxFxVersion": "[variables('linuxfxver')]",
-                    "alwaysOn": false,
-                    "connectionStrings": [
-                        {
-                            "name": "redis",
-                            "connectionString": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
-                            "type": "RedisCache"
-                        },
-                        {
-                            "name": "postgres",
-                            "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('administratorLogin'), '@', variables('pgserverName'), ';Password=', parameters('administratorLoginPassword'), ';')]",
-                            "type": "PostgreSQL"
-                        }
-                    ]
+                    "reserved": true,
+                    "alwaysOn": false
                 }
             }
         }
