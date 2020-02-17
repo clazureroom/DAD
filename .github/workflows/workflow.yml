@@ -1,1 +1,56 @@
+on: [push]
 
+name: Linux_Container_Ruby_Workflow
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    # checkout the repo
+    - name: 'Checkout Github Action' 
+      uses: actions/checkout@master
+    
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: contoso.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    # TODO: use our docker images
+    - run: |
+        docker build . -t contoso.azurecr.io/nodejssampleapp:${{ github.sha }}
+        docker push contoso.azurecr.io/nodejssampleapp:${{ github.sha }} 
+      
+    - uses: azure/webapps-container-deploy@v1
+      with:
+        app-name: 'ruby-rnc'
+        # TODO: replace images with our docker images
+        images: 'contoso.azurecr.io/nodejssampleapp:${{ github.sha }}'
+    
+    # TODO: Set up Ruby
+    # - name: Set up Ruby
+    #   uses: actions/setup-ruby@v1
+    #   with:
+    #     ruby-version: 2.6
+  
+    # - name: Build and test with Rake
+    #   env:
+    #     PGHOST: 127.0.0.1
+    #     PGUSER: postgres
+    #     RAILS_ENV: test
+    #   run: |
+    #     sudo apt -yqq install libpq-dev
+    #     gem install bundler
+    #     bundle install --jobs 4 --retry 3
+    #     bundle exec rails db:create
+    #     bundle exec rails db:migrate
+    #     bundle exec rails test
+    
+    - name: Azure logout
+      run: |
+        az logout
