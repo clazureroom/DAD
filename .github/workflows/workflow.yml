@@ -8,7 +8,7 @@ jobs:
     steps:
     # checkout the repo
     - name: 'Checkout Github Action' 
-      uses: actions/checkout@gg_dev
+      uses: actions/checkout@master
     
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
