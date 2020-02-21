@@ -9,6 +9,8 @@ jobs:
     # checkout the repo
     - name: 'Checkout Github Action' 
       uses: actions/checkout@master
+
+    - name: 'On Custom Webhook'
       if: github.event.action == 'my_webhook'
       run: |
         ls
