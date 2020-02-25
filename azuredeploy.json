@@ -164,6 +164,19 @@
 				"description": "The size of the new Azure Redis Cache instance. "
 			}
 		},
+		"acrAdminUserEnabled": {
+			"type": "bool",
+			"defaultValue": true
+		},
+    	"acrSku": {
+    		"type": "string",
+    		"defaultValue": "Basic",
+    		"allowedValues": [
+    			"Basic",
+    			"Standard",
+    			"Premium"
+    		]
+    	},
 		"location": {
 			"type": "string",
 			"defaultValue": "UK South",
@@ -177,10 +190,7 @@
 		"webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
 		"pgserverName": "[concat('pgserver', uniqueString(resourceGroup().id))]",
 		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]",
-		"dockerRegistryUrl": "ggmanualacr.azurecr.io",
-		"dockerRegistryUsername": "ggmanualacr",
-		"dockerRegistryPassword": "MJ8uBYa=QzwPy+5YMIwiZgRYumOB4hzL",
-		"linuxfxver": "DOCKER|ggmanualacr.azurecr.io/ggweb797a:24"
+		"acrName": "[concat('arc', uniqueString(resourceGroup().id))]"
 	},
 	"resources": [
 		{
@@ -202,6 +212,19 @@
 				}
 			}
 		},
+		{
+			"name": "[variables('acrName')]",
+      		"type": "Microsoft.ContainerRegistry/registries",
+      		"apiVersion": "2019-05-01",
+     		"location": "[parameters('location')]",
+      		"sku": {
+        		"name": "[parameters('acrSku')]",
+        		"tier": "[parameters('acrSku')]"
+      		},
+      		"properties": {
+        		"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
+      		}
+    	},
 		{
 			"apiVersion": "2017-12-01",
 			"type": "Microsoft.DBforPostgreSQL/servers",
@@ -252,14 +275,15 @@
 			}
 		},
 		{
-			"name": "webapp-auto-deploy-001",
+			"name": "[variables('webSiteName')]",
 			"type": "Microsoft.Web/sites",
 			"apiVersion": "2018-11-01",
 			"location": "UK South",
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
 				"[concat('Microsoft.Cache/Redis/', variables('cacheName'))]",
-				"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
+				"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]",
+				"[concat('Microsoft.ContainerRegistry/registries/', variables('acrName'))]"
 			],
 			"properties": {
 				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
@@ -267,15 +291,15 @@
 					"appSettings": [
 						{
 							"name": "DOCKER_REGISTRY_SERVER_URL",
-							"value": "[variables('dockerRegistryUrl')]"
+							"value": "[concat(variables('acrName'), '.azurecr.io')]"
 						},
 						{
 							"name": "DOCKER_REGISTRY_SERVER_USERNAME",
-							"value": "[variables('dockerRegistryUsername')]"
+							"value": "[variables('acrName')]"
 						},
 						{
 							"name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-							"value": "[variables('dockerRegistryPassword')]"
+							"value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
 						},
 						{
 							"name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
@@ -300,9 +324,53 @@
 						{
 							"name": "DATABASE_URL",
 							"value": "[concat('postgres://',uriComponent(concat(parameters('administratorLogin'), '@', variables('pgserverName'))),':', parameters('administratorLoginPassword'),'@', reference(concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))).fullyQualifiedDomainName,':5432/postgres')]"
+						},
+						{
+							"name": "CLASSROOM_WEBHOOK_URL_PREFIX",
+							"value": "[concat('https://', variables('webSiteName'),'.azurewebsites.net')]"
+						},
+						{
+							"name": "GITHUB_CLIENT_ID",
+							"value": "a4465269281372be0fec"
+						},
+						{
+							"name": "GITHUB_CLIENT_SECRET",
+							"value": "6441c69bbf45fa9d4bc7fde728afd743abcad7e5"
+						},
+						{
+							"name": "NON_STAFF_GITHUB_ADMIN_IDS",
+							"value": "9089981"
+						},
+						{
+							"name": "RACK_ENV",
+							"value": "production"
+						},
+						{
+							"name": "RAILS_ENV",
+							"value": "production"
+						},
+						{
+							"name": "RAILS_LOG_TO_STDOUT",
+							"value": "enabled"
+						},
+						{
+							"name": "RAILS_SERVE_STATIC_FILES",
+							"value": "enabled"
+						},
+						{
+							"name": "SECRET_KEY_BASE",
+							"value": "4433100e069310220851c7c277a5fc419a45bcbe87bb04a6868662eddc5e07ab00ad6f1fedd66093ecd54d3cbf237566f6ef21fac0c9c4b32a5011d79c000017"
+						},
+						{
+							"name": "WEBSITE_ENABLE_SYNC_UPDATE_SITE",
+							"value": "true"
+						},
+						{
+							"name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+							"value": "3"
 						}
 					],
-					"linuxFxVersion": "[variables('linuxfxver')]",
+					"linuxFxVersion": "[concat('DOCKER|', variables('acrName'),'.azurecr.io')]",
 					"reserved": true,
 					"alwaysOn": false
 				}
