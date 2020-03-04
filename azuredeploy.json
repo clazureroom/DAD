@@ -226,7 +226,7 @@
 			},
 			"resources": [
 				{
-					"type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
+					"type": "firewallRules",
 					"apiVersion": "2017-12-01",
 					"name": "[concat(variables('pgserverName'),'firewall')]",
 					"properties": {
