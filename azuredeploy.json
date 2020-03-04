@@ -16,27 +16,6 @@
 				"description": "Azure database for PostgreSQL compute capacity in vCores (2,4,8,16,32)"
 			}
 		},
-		"databaseSkuName": {
-			"type": "string",
-			"defaultValue": "GP_Gen5_2",
-			"allowedValues": [
-				"GP_Gen5_2",
-				"GP_Gen5_4",
-				"GP_Gen5_8",
-				"GP_Gen5_16",
-				"GP_Gen5_32",
-				"MO_Gen5_2",
-				"MO_Gen5_4",
-				"MO_Gen5_8",
-				"MO_Gen5_16",
-				"MO_Gen5_32",
-				"B_Gen5_1",
-				"B_Gen5_2"
-			],
-			"metadata": {
-				"description": "Azure database for PostgreSQL sku name "
-			}
-		},
 		"databaseSkuSizeMB": {
 			"type": "int",
 			"allowedValues": [
@@ -46,56 +25,6 @@
 			"defaultValue": 51200,
 			"metadata": {
 				"description": "Azure database for PostgreSQL Sku Size "
-			}
-		},
-		"databaseSkuTier": {
-			"type": "string",
-			"defaultValue": "GeneralPurpose",
-			"allowedValues": [
-				"GeneralPurpose",
-				"MemoryOptimized",
-				"Basic"
-			],
-			"metadata": {
-				"description": "Azure database for PostgreSQL pricing tier"
-			}
-		},
-		"postgresqlVersion": {
-			"type": "string",
-			"allowedValues": [
-				"9.5",
-				"9.6",
-				"10",
-				"11"
-			],
-			"defaultValue": "11",
-			"metadata": {
-				"description": "PostgreSQL version"
-			}
-		},
-		"databaseskuFamily": {
-			"type": "string",
-			"defaultValue": "Gen5",
-			"metadata": {
-				"description": "Azure database for PostgreSQL sku family"
-			}
-		},
-		"skuName": {
-			"type": "string",
-			"defaultValue": "B1",
-			"allowedValues": [
-				"B1",
-				"B2",
-				"B3",
-				"S1",
-				"S2",
-				"S3",
-				"P1v2",
-				"P2v2",
-				"P3v2"
-			],
-			"metadata": {
-				"description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-gb/pricing/details/app-service/linux/"
 			}
 		},
 		"skuCapacity": {
@@ -120,27 +49,6 @@
 				"description": "The password of the admin user of the PostgreSQL Server"
 			}
 		},
-		"cacheSKUName": {
-			"type": "string",
-			"allowedValues": [
-				"Basic",
-				"Standard"
-			],
-			"defaultValue": "Basic",
-			"metadata": {
-				"description": "The pricing tier of the new Azure Redis Cache."
-			}
-		},
-		"cacheSKUFamily": {
-			"type": "string",
-			"allowedValues": [
-				"C"
-			],
-			"defaultValue": "C",
-			"metadata": {
-				"description": "The family for the sku."
-			}
-		},
 		"cacheSKUCapacity": {
 			"type": "int",
 			"allowedValues": [
@@ -157,19 +65,6 @@
 				"description": "The size of the new Azure Redis Cache instance. "
 			}
 		},
-		"acrAdminUserEnabled": {
-			"type": "bool",
-			"defaultValue": true
-		},
-		"acrSku": {
-			"type": "string",
-			"defaultValue": "Basic",
-			"allowedValues": [
-				"Basic",
-				"Standard",
-				"Premium"
-			]
-		},
 		"location": {
 			"type": "string",
 			"defaultValue": "UK South",
@@ -183,7 +78,16 @@
 		"webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
 		"pgserverName": "[concat('pgserver', uniqueString(resourceGroup().id))]",
 		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]",
-		"acrName": "[concat('arc', uniqueString(resourceGroup().id))]"
+		"acrName": "[concat('arc', uniqueString(resourceGroup().id))]",
+		"databaseSkuName": "GP_Gen5_2",
+		"databaseSkuTier": "GeneralPurpose",
+		"postgresqlVersion": "11",
+		"databaseskuFamily": "Gen5",
+		"skuName": "B1",
+		"cacheSKUName": "Basic",
+		"cacheSKUFamily": "C",
+		"acrAdminUserEnabled": true,
+		"acrSku": "Basic"
 	},
 	"resources": [
 		{
@@ -194,8 +98,8 @@
 			"properties": {
 				"enableNonSslPort": true,
 				"sku": {
-					"name": "[parameters('cacheSKUName')]",
-					"family": "[parameters('cacheSKUFamily')]",
+					"name": "[variables('cacheSKUName')]",
+					"family": "[variables('cacheSKUFamily')]",
 					"capacity": "[parameters('cacheSKUCapacity')]"
 				}
 			}
@@ -206,10 +110,10 @@
 			"name": "[variables('acrName')]",
 			"location": "[parameters('location')]",
 			"sku": {
-				"name": "[parameters('acrSku')]"
+				"name": "[variables('acrSku')]"
 			},
 			"properties": {
-				"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
+				"adminUserEnabled": "[variables('acrAdminUserEnabled')]"
 			}
 		},
 		{
@@ -218,11 +122,11 @@
 			"name": "[variables('pgserverName')]",
 			"location": "[parameters('location')]",
 			"sku": {
-				"name": "[parameters('databaseSkuName')]",
-				"tier": "[parameters('databaseSkuTier')]",
+				"name": "[variables('databaseSkuName')]",
+				"tier": "[variables('databaseSkuTier')]",
 				"capacity": "[parameters('databaseSkucapacity')]",
 				"size": "[parameters('databaseSkuSizeMB')]",
-				"family": "[parameters('databaseskuFamily')]"
+				"family": "[variables('databaseskuFamily')]"
 			},
 			"resources": [
 				{
@@ -239,7 +143,7 @@
 				}
 			],
 			"properties": {
-				"version": "[parameters('postgresqlVersion')]",
+				"version": "[variables('postgresqlVersion')]",
 				"createMode": "Default",
 				"administratorLogin": "[parameters('administratorLogin')]",
 				"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
@@ -252,7 +156,7 @@
 			"name": "[variables('hostingPlanName')]",
 			"location": "[parameters('location')]",
 			"sku": {
-				"name": "[parameters('skuName')]",
+				"name": "[variables('skuName')]",
 				"capacity": "[parameters('skuCapacity')]"
 			},
 			"kind": "linux",
