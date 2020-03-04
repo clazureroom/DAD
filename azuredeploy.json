@@ -229,6 +229,9 @@
 					"type": "firewallRules",
 					"apiVersion": "2017-12-01",
 					"name": "[concat(variables('pgserverName'),'firewall')]",
+					"dependsOn": [
+						"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
+					],
 					"properties": {
 						"startIpAddress": "0.0.0.0",
 						"endIpAddress": "0.0.0.0"
