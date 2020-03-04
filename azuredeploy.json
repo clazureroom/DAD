@@ -2,69 +2,6 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"databaseSkuCapacity": {
-			"type": "int",
-			"defaultValue": 2,
-			"allowedValues": [
-				2,
-				4,
-				8,
-				16,
-				32
-			],
-			"metadata": {
-				"description": "Azure database for PostgreSQL compute capacity in vCores (2,4,8,16,32)"
-			}
-		},
-		"databaseSkuSizeMB": {
-			"type": "int",
-			"allowedValues": [
-				102400,
-				51200
-			],
-			"defaultValue": 51200,
-			"metadata": {
-				"description": "Azure database for PostgreSQL Sku Size "
-			}
-		},
-		"skuCapacity": {
-			"type": "int",
-			"defaultValue": 1,
-			"minValue": 1,
-			"metadata": {
-				"description": "Describes plan's instance count"
-			}
-		},
-		"administratorLogin": {
-			"type": "string",
-			"defaultValue": "Simon",
-			"metadata": {
-				"description": "The admin user of the PostgreSQL Server"
-			}
-		},
-		"administratorLoginPassword": {
-			"type": "securestring",
-			"defaultValue": "HappyNewYear2020",
-			"metadata": {
-				"description": "The password of the admin user of the PostgreSQL Server"
-			}
-		},
-		"cacheSKUCapacity": {
-			"type": "int",
-			"allowedValues": [
-				0,
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"defaultValue": 1,
-			"metadata": {
-				"description": "The size of the new Azure Redis Cache instance. "
-			}
-		},
 		"location": {
 			"type": "string",
 			"defaultValue": "UK South",
@@ -87,7 +24,13 @@
 		"cacheSKUName": "Basic",
 		"cacheSKUFamily": "C",
 		"acrAdminUserEnabled": true,
-		"acrSku": "Basic"
+		"acrSku": "Basic",
+		"databaseSkuCapacity": 2,
+		"databaseSkuSizeMB": 51200,
+		"skuCapacity": 1,
+		"administratorLogin": "resourceGroup().name",
+		"administratorLoginPassword": "uniqueString(resourceGroup().name)",
+		"cacheSKUCapacity": 1
 	},
 	"resources": [
 		{
@@ -100,7 +43,7 @@
 				"sku": {
 					"name": "[variables('cacheSKUName')]",
 					"family": "[variables('cacheSKUFamily')]",
-					"capacity": "[parameters('cacheSKUCapacity')]"
+					"capacity": "[variables('cacheSKUCapacity')]"
 				}
 			}
 		},
@@ -124,8 +67,8 @@
 			"sku": {
 				"name": "[variables('databaseSkuName')]",
 				"tier": "[variables('databaseSkuTier')]",
-				"capacity": "[parameters('databaseSkucapacity')]",
-				"size": "[parameters('databaseSkuSizeMB')]",
+				"capacity": "[variables('databaseSkucapacity')]",
+				"size": "[variables('databaseSkuSizeMB')]",
 				"family": "[variables('databaseskuFamily')]"
 			},
 			"resources": [
@@ -145,9 +88,9 @@
 			"properties": {
 				"version": "[variables('postgresqlVersion')]",
 				"createMode": "Default",
-				"administratorLogin": "[parameters('administratorLogin')]",
-				"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-				"storageMB": "[parameters('databaseSkuSizeMB')]"
+				"administratorLogin": "[variables('administratorLogin')]",
+				"administratorLoginPassword": "[variables('administratorLoginPassword')]",
+				"storageMB": "[variables('databaseSkuSizeMB')]"
 			}
 		},
 		{
@@ -157,7 +100,7 @@
 			"location": "[parameters('location')]",
 			"sku": {
 				"name": "[variables('skuName')]",
-				"capacity": "[parameters('skuCapacity')]"
+				"capacity": "[variables('skuCapacity')]"
 			},
 			"kind": "linux",
 			"properties": {
@@ -215,7 +158,7 @@
 						},
 						{
 							"name": "DATABASE_URL",
-							"value": "[concat('postgres://',uriComponent(concat(parameters('administratorLogin'), '@', variables('pgserverName'))),':', parameters('administratorLoginPassword'),'@', reference(concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))).fullyQualifiedDomainName,':5432/postgres')]"
+							"value": "[concat('postgres://',uriComponent(concat(variables('administratorLogin'), '@', variables('pgserverName'))),':', variables('administratorLoginPassword'),'@', reference(concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))).fullyQualifiedDomainName,':5432/postgres')]"
 						},
 						{
 							"name": "CLASSROOM_WEBHOOK_URL_PREFIX",
