@@ -187,15 +187,10 @@
 	},
 	"resources": [
 		{
-			"name": "[variables('cacheName')]",
 			"type": "Microsoft.Cache/Redis",
+			"apiVersion": "2019-07-01",
+			"name": "[variables('cacheName')]",
 			"location": "[parameters('location')]",
-			"apiVersion": "2015-08-01",
-			"dependsOn": [
-			],
-			"tags": {
-				"displayName": "cache"
-			},
 			"properties": {
 				"enableNonSslPort": true,
 				"sku": {
@@ -206,23 +201,22 @@
 			}
 		},
 		{
-			"name": "[variables('acrName')]",
 			"type": "Microsoft.ContainerRegistry/registries",
 			"apiVersion": "2019-05-01",
+			"name": "[variables('acrName')]",
 			"location": "[parameters('location')]",
 			"sku": {
-				"name": "[parameters('acrSku')]",
-				"tier": "[parameters('acrSku')]"
+				"name": "[parameters('acrSku')]"
 			},
 			"properties": {
 				"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
 			}
 		},
 		{
-			"apiVersion": "2017-12-01",
 			"type": "Microsoft.DBforPostgreSQL/servers",
-			"location": "[parameters('location')]",
+			"apiVersion": "2017-12-01",
 			"name": "[variables('pgserverName')]",
+			"location": "[parameters('location')]",
 			"sku": {
 				"name": "[parameters('databaseSkuName')]",
 				"tier": "[parameters('databaseSkuTier')]",
@@ -230,47 +224,43 @@
 				"size": "[parameters('databaseSkuSizeMB')]",
 				"family": "[parameters('databaseskuFamily')]"
 			},
-			"properties": {
-				"version": "[parameters('postgresqlVersion')]",
-				"createMode": "Default",
-				"administratorLogin": "[parameters('administratorLogin')]",
-				"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-				"storageMB": "[parameters('databaseSkuSizeMB')]"
-			},
 			"resources": [
 				{
-					"type": "firewallrules",
+					"type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
 					"apiVersion": "2017-12-01",
-					"dependsOn": [
-						"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
-					],
-					"location": "[parameters('location')]",
 					"name": "[concat(variables('pgserverName'),'firewall')]",
 					"properties": {
 						"startIpAddress": "0.0.0.0",
 						"endIpAddress": "0.0.0.0"
 					}
 				}
-			]
+			],
+			"properties": {
+				"version": "[parameters('postgresqlVersion')]",
+				"createMode": "Default",
+				"administratorLogin": "[parameters('administratorLogin')]",
+				"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+				"storageMB": "[parameters('databaseSkuSizeMB')]"
+			}
 		},
 		{
-			"apiVersion": "2018-11-01",
-			"name": "[variables('hostingPlanName')]",
 			"type": "Microsoft.Web/serverfarms",
+			"apiVersion": "2019-08-01",
+			"name": "[variables('hostingPlanName')]",
 			"location": "[parameters('location')]",
-			"kind": "linux",
 			"sku": {
 				"name": "[parameters('skuName')]",
 				"capacity": "[parameters('skuCapacity')]"
 			},
+			"kind": "linux",
 			"properties": {
 				"reserved": true
 			}
 		},
 		{
-			"name": "[variables('webSiteName')]",
 			"type": "Microsoft.Web/sites",
-			"apiVersion": "2018-11-01",
+			"apiVersion": "2019-08-01",
+			"name": "[variables('webSiteName')]",
 			"location": "UK South",
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
@@ -280,7 +270,9 @@
 			],
 			"properties": {
 				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+				"reserved": true,
 				"siteConfig": {
+					"linuxFxVersion": "[concat('DOCKER|', variables('acrName'),'.azurecr.io')]",
 					"appSettings": [
 						{
 							"name": "DOCKER_REGISTRY_SERVER_URL",
@@ -363,8 +355,6 @@
 							"value": "3"
 						}
 					],
-					"linuxFxVersion": "[concat('DOCKER|', variables('acrName'),'.azurecr.io')]",
-					"reserved": true,
 					"alwaysOn": false,
 					"appCommandLine": "bundle exec rake db:migrate"
 				}
