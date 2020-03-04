@@ -290,6 +290,10 @@
 							"value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
 						},
 						{
+							"name": "DOCKER_ENABLE_CI",
+							"value": "true"
+						},
+						{
 							"name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
 							"value": "false"
 						},
