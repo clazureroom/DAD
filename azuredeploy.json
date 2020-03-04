@@ -120,13 +120,6 @@
 				"description": "The password of the admin user of the PostgreSQL Server"
 			}
 		},
-		"databaseName": {
-			"type": "string",
-			"defaultValue": "databass",
-			"metadata": {
-				"description": "The name of the new database to create."
-			}
-		},
 		"cacheSKUName": {
 			"type": "string",
 			"allowedValues": [
@@ -168,15 +161,15 @@
 			"type": "bool",
 			"defaultValue": true
 		},
-    	"acrSku": {
-    		"type": "string",
-    		"defaultValue": "Basic",
-    		"allowedValues": [
-    			"Basic",
-    			"Standard",
-    			"Premium"
-    		]
-    	},
+		"acrSku": {
+			"type": "string",
+			"defaultValue": "Basic",
+			"allowedValues": [
+				"Basic",
+				"Standard",
+				"Premium"
+			]
+		},
 		"location": {
 			"type": "string",
 			"defaultValue": "UK South",
@@ -214,17 +207,17 @@
 		},
 		{
 			"name": "[variables('acrName')]",
-      		"type": "Microsoft.ContainerRegistry/registries",
-      		"apiVersion": "2019-05-01",
-     		"location": "[parameters('location')]",
-      		"sku": {
-        		"name": "[parameters('acrSku')]",
-        		"tier": "[parameters('acrSku')]"
-      		},
-      		"properties": {
-        		"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
-      		}
-    	},
+			"type": "Microsoft.ContainerRegistry/registries",
+			"apiVersion": "2019-05-01",
+			"location": "[parameters('location')]",
+			"sku": {
+				"name": "[parameters('acrSku')]",
+				"tier": "[parameters('acrSku')]"
+			},
+			"properties": {
+				"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
+			}
+		},
 		{
 			"apiVersion": "2017-12-01",
 			"type": "Microsoft.DBforPostgreSQL/servers",
