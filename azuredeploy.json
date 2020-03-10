@@ -275,19 +275,11 @@
 				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
 				"reserved": true,
 				"siteConfig": {
-					"linuxFxVersion": "[concat('DOCKER|', variables('acrName'),'.azurecr.io')]",
+					"linuxFxVersion": "DOCKER|gisligeorgs/classroom:latest",
 					"appSettings": [
 						{
 							"name": "DOCKER_REGISTRY_SERVER_URL",
-							"value": "[concat(variables('acrName'), '.azurecr.io')]"
-						},
-						{
-							"name": "DOCKER_REGISTRY_SERVER_USERNAME",
-							"value": "[variables('acrName')]"
-						},
-						{
-							"name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-							"value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
+							"value": "https://index.docker.io"
 						},
 						{
 							"name": "DOCKER_ENABLE_CI",
