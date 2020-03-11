@@ -201,18 +201,6 @@
 			}
 		},
 		{
-			"type": "Microsoft.ContainerRegistry/registries",
-			"apiVersion": "2019-05-01",
-			"name": "[variables('acrName')]",
-			"location": "[parameters('location')]",
-			"sku": {
-				"name": "[parameters('acrSku')]"
-			},
-			"properties": {
-				"adminUserEnabled": "[parameters('acrAdminUserEnabled')]"
-			}
-		},
-		{
 			"type": "Microsoft.DBforPostgreSQL/servers",
 			"apiVersion": "2017-12-01",
 			"name": "[variables('pgserverName')]",
@@ -280,10 +268,6 @@
 						{
 							"name": "DOCKER_REGISTRY_SERVER_URL",
 							"value": "https://index.docker.io"
-						},
-						{
-							"name": "DOCKER_ENABLE_CI",
-							"value": "true"
 						},
 						{
 							"name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
