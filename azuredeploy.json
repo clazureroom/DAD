@@ -37,7 +37,7 @@
 		},
 		"administratorLogin": {
 			"type": "string",
-			"defaultValue": "[resourceGroup().name]",
+			"defaultValue": "Admin",
 			"metadata": {
 				"description": "The admin user of the PostgreSQL Server"
 			}
@@ -93,9 +93,9 @@
 	},
 	"variables": {
 		"hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
-		"webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-		"pgserverName": "[concat('pgserver', uniqueString(resourceGroup().id))]",
-		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]",
+		"webSiteName": "[concat('app-', uniqueString(resourceGroup().id))]",
+		"pgserverName": "[concat('psql-', uniqueString(resourceGroup().id))]",
+		"cacheName": "[concat('redis-', uniqueString(resourceGroup().id))]",
 		"databaseSkuName": "GP_Gen5_2",
 		"databaseSkuTier": "GeneralPurpose",
 		"postgresqlVersion": "11",
@@ -103,7 +103,7 @@
 		"skuName": "B1",
 		"cacheSKUName": "Basic",
 		"cacheSKUFamily": "C",
-		"secertKeyBase": "[uniqueString(resourceGroup().name)]"
+		"secertKeyBase": "[uniqueString(resourceGroup().id)]"
 	},
 	"resources": [
 		{
