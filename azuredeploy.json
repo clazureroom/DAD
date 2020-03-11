@@ -256,8 +256,7 @@
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
 				"[concat('Microsoft.Cache/Redis/', variables('cacheName'))]",
-				"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]",
-				"[concat('Microsoft.ContainerRegistry/registries/', variables('acrName'))]"
+				"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
 			],
 			"properties": {
 				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
