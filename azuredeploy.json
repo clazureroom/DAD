@@ -157,19 +157,6 @@
 				"description": "The size of the new Azure Redis Cache instance. "
 			}
 		},
-		"acrAdminUserEnabled": {
-			"type": "bool",
-			"defaultValue": true
-		},
-		"acrSku": {
-			"type": "string",
-			"defaultValue": "Basic",
-			"allowedValues": [
-				"Basic",
-				"Standard",
-				"Premium"
-			]
-		},
 		"location": {
 			"type": "string",
 			"defaultValue": "UK South",
@@ -182,8 +169,7 @@
 		"hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
 		"webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
 		"pgserverName": "[concat('pgserver', uniqueString(resourceGroup().id))]",
-		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]",
-		"acrName": "[concat('arc', uniqueString(resourceGroup().id))]"
+		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]"
 	},
 	"resources": [
 		{
