@@ -85,8 +85,8 @@
 		},
 		"location": {
 			"type": "string",
+			"defaultValue": "UK South",
 			"metadata": {
-				"defaultValue": "UK South",
 				"description": "Location for all resources."
 			}
 		}
@@ -105,7 +105,8 @@
 		"cacheSKUName": "Basic",
 		"cacheSKUFamily": "C",
 		"acrAdminUserEnabled": true,
-		"acrSku": "Basic"
+		"acrSku": "Basic",
+		"secertKeyBase": "[uniqueString(resourceGroup().name)]"
 	},
 	"resources": [
 		{
@@ -261,7 +262,7 @@
 						},
 						{
 							"name": "SECRET_KEY_BASE",
-							"value": "4433100e069310220851c7c277a5fc419a45bcbe87bb04a6868662eddc5e07ab00ad6f1fedd66093ecd54d3cbf237566f6ef21fac0c9c4b32a5011d79c000017"
+							"value": "[variables('secertKeyBase')]"
 						},
 						{
 							"name": "WEBSITE_ENABLE_SYNC_UPDATE_SITE",
