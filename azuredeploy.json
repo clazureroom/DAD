@@ -37,7 +37,7 @@
 		},
 		"administratorLogin": {
 			"type": "string",
-			"defaultValue": "Admin",
+			"defaultValue": "psql-admin",
 			"metadata": {
 				"description": "The admin user of the PostgreSQL Server"
 			}
