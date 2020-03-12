@@ -2,6 +2,13 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
+		"webSiteName": {
+			"type": "string",
+			"defaultValue": "[concat('app-', uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "Name of the web site"
+			}
+		},
 		"databaseSkuCapacity": {
 			"type": "int",
 			"defaultValue": 2,
@@ -93,7 +100,6 @@
 	},
 	"variables": {
 		"hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
-		"webSiteName": "[concat('app-', uniqueString(resourceGroup().id))]",
 		"pgserverName": "[concat('psql-', uniqueString(resourceGroup().id))]",
 		"cacheName": "[concat('redis-', uniqueString(resourceGroup().id))]",
 		"databaseSkuName": "GP_Gen5_2",
@@ -171,7 +177,7 @@
 		{
 			"type": "Microsoft.Web/sites",
 			"apiVersion": "2019-08-01",
-			"name": "[variables('webSiteName')]",
+			"name": "[parameters('webSiteName')]",
 			"location": "UK South",
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
@@ -214,7 +220,7 @@
 						},
 						{
 							"name": "CLASSROOM_WEBHOOK_URL_PREFIX",
-							"value": "[concat('https://', variables('webSiteName'),'.azurewebsites.net')]"
+							"value": "[concat('https://',parameters('webSiteName'),'.azurewebsites.net')]"
 						},
 						{
 							"name": "GITHUB_CLIENT_ID",
