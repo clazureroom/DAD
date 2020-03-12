@@ -4,7 +4,7 @@
 	"parameters": {
 		"webSiteName": {
 			"type": "string",
-			"defaultValue": "[concat('app-', uniqueString(resourceGroup().id))]",
+			"defaultValue": "app-classroom",
 			"metadata": {
 				"description": "Name of the web site"
 			}
