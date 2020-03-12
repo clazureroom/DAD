@@ -103,7 +103,7 @@
 		"skuName": "B1",
 		"cacheSKUName": "Basic",
 		"cacheSKUFamily": "C",
-		"secertKeyBase": "[uniqueString(resourceGroup().id)]"
+		"secretKeyBase": "[uniqueString(resourceGroup().id)]"
 	},
 	"resources": [
 		{
@@ -246,7 +246,7 @@
 						},
 						{
 							"name": "SECRET_KEY_BASE",
-							"value": "[variables('secertKeyBase')]"
+							"value": "[variables('secretKeyBase')]"
 						},
 						{
 							"name": "WEBSITE_ENABLE_SYNC_UPDATE_SITE",
