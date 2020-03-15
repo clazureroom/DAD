@@ -51,7 +51,6 @@
 		},
 		"administratorLoginPassword": {
 			"type": "securestring",
-			"defaultValue": "[uniqueString(resourceGroup().id)]",
 			"metadata": {
 				"description": "The password of the admin user of the PostgreSQL Server."
 			}
@@ -142,7 +141,7 @@
 				{
 					"type": "firewallRules",
 					"apiVersion": "2017-12-01",
-					"name": "[concat(variables('pgserverName'),'firewall')]",
+					"name": "AllowAzureIPs",
 					"dependsOn": [
 						"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
 					],
