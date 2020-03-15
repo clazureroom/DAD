@@ -1,5 +1,5 @@
 {
-	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"webSiteName": {
@@ -92,14 +92,14 @@
 		},
 		"location": {
 			"type": "string",
-			"defaultValue": "UK South",
+			"defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Location for all resources."
 			}
 		}
 	},
 	"variables": {
-		"hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
+		"hostingPlanName": "[concat('hpn-', uniqueString(resourceGroup().id))]",
 		"pgserverName": "[concat('psql-', uniqueString(resourceGroup().id))]",
 		"cacheName": "[concat('redis-', uniqueString(resourceGroup().id))]",
 		"databaseSkuName": "GP_Gen5_2",
@@ -178,7 +178,7 @@
 			"type": "Microsoft.Web/sites",
 			"apiVersion": "2019-08-01",
 			"name": "[parameters('webSiteName')]",
-			"location": "UK South",
+			"location": "[parameters('location')]",
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
 				"[concat('Microsoft.Cache/Redis/', variables('cacheName'))]",
