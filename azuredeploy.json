@@ -91,7 +91,7 @@
 		},
 		"location": {
 			"type": "string",
-			"defaultValue": "UK South",
+			"defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Location for all resources."
 			}
