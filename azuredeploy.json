@@ -4,7 +4,7 @@
 	"parameters": {
 		"webSiteName": {
 			"type": "string",
-			"defaultValue": "app-classroom",
+			"defaultValue": "[concat('GitHub-Classroom-', uniqueString(resourceGroup().id))]",
 			"metadata": {
 				"description": "Name of the web site."
 			}
@@ -26,8 +26,8 @@
 		"databaseSkuSizeMB": {
 			"type": "int",
 			"allowedValues": [
-				102400,
-				51200
+				51200,
+				102400
 			],
 			"defaultValue": 51200,
 			"metadata": {
