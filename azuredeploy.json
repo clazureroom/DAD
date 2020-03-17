@@ -55,7 +55,7 @@
 				"description": "The password of the admin user of the PostgreSQL Server."
 			}
 		},
-		"cacheSKUCapacity": {
+		"cacheSkuCapacity": {
 			"type": "int",
 			"allowedValues": [
 				0,
@@ -104,10 +104,10 @@
 		"databaseSkuName": "GP_Gen5_2",
 		"databaseSkuTier": "GeneralPurpose",
 		"postgresqlVersion": "11",
-		"databaseskuFamily": "Gen5",
+		"databaseSkuFamily": "Gen5",
 		"skuName": "B1",
-		"cacheSKUName": "Basic",
-		"cacheSKUFamily": "C",
+		"cacheSkuName": "Basic",
+		"cacheSkuFamily": "C",
 		"secretKeyBase": "[uniqueString(resourceGroup().id)]"
 	},
 	"resources": [
@@ -119,9 +119,9 @@
 			"properties": {
 				"enableNonSslPort": true,
 				"sku": {
-					"name": "[variables('cacheSKUName')]",
-					"family": "[variables('cacheSKUFamily')]",
-					"capacity": "[parameters('cacheSKUCapacity')]"
+					"name": "[variables('cacheSkuName')]",
+					"family": "[variables('cacheSkuFamily')]",
+					"capacity": "[parameters('cacheSkuCapacity')]"
 				}
 			}
 		},
@@ -135,7 +135,7 @@
 				"tier": "[variables('databaseSkuTier')]",
 				"capacity": "[parameters('databaseSkucapacity')]",
 				"size": "[parameters('databaseSkuSizeMB')]",
-				"family": "[variables('databaseskuFamily')]"
+				"family": "[variables('databaseSkuFamily')]"
 			},
 			"resources": [
 				{
