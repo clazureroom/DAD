@@ -102,7 +102,7 @@
 		"pgserverName": "[concat('psql-', uniqueString(resourceGroup().id))]",
 		"cacheName": "[concat('redis-', uniqueString(resourceGroup().id))]",
 		"databaseSkuName": "GP_Gen5_2",
-		"databaseSkuTier": "GeneralPurpose",
+		"databaseSkuTier": "Basic",
 		"postgresqlVersion": "11",
 		"databaseSkuFamily": "Gen5",
 		"skuName": "B1",
