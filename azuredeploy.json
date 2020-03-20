@@ -4,11 +4,14 @@
 	"parameters": {
 		"webSiteName": {
 			"type": "string",
-			"defaultValue": "[concat('GitHub-Classroom-', uniqueString(resourceGroup().id))]",
+			// "defaultValue": "[concat('GitHub-Classroom-', uniqueString(resourceGroup().id))]",
 			"metadata": {
 				"description": "Name of the web site."
 			}
 		},
+		"hostingPlanName": {
+      		"type": "string"
+    	},
 		"databaseSkuTier": {
             "type": "string",
             "allowedValues": [
@@ -154,7 +157,7 @@
 		},
 		"location": {
 			"type": "string",
-			"defaultValue": "[resourceGroup().location]",
+			// "defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Location for all resources."
 			}
@@ -230,6 +233,22 @@
 			"kind": "linux",
 			"properties": {
 				"reserved": true
+			}
+		},
+		{
+      		"apiVersion": "2014-06-01",
+      		"name": "[parameters('websiteName')]",
+			"type": "Microsoft.Web/Sites",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[concat('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
+			],
+			"tags": {
+				"[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty"
+			},
+			"properties": {
+				"name": "[parameters('webSiteName')]",
+				"serverFarm": "[parameters('hostingPlanName')]"
 			}
 		},
 		{
