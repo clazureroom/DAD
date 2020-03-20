@@ -25,6 +25,7 @@
 			"type": "int",
 			"defaultValue": 1,
 			"allowedValues": [
+				1,
 				2,
 				4,
 				8,
@@ -37,7 +38,7 @@
 		},
 		"databaseSkuName": {
 			"type": "string",
-			"defaultValue": "GP_Gen5_2",
+			"defaultValue": "B_Gen5_1",
 			"allowedValues": [
 				"GP_Gen5_2",
 				"GP_Gen5_4",
