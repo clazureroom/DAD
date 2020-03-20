@@ -4,7 +4,6 @@
 	"parameters": {
 		"webSiteName": {
 			"type": "string",
-			"defaultValue": "[concat('GitHub-Classroom-', uniqueString(resourceGroup().id))]",
 			"metadata": {
 				"description": "Name of the web site."
 			}
