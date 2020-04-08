@@ -2,10 +2,30 @@
 	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
+		"webSiteName": {
+			"type": "string",
+			"defaultValue": "[concat('GitHub-Classroom-', uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "Name of the web site."
+			}
+		},
+		"databaseSkuTier": {
+            "type": "string",
+            "allowedValues": [
+                "GeneralPurpose",
+                "MemoryOptimized",
+                "Basic"
+            ],
+            "defaultValue": "Basic",
+            "metadata": {
+                "description": "Azure database for PostgreSQL pricing tier"
+            }
+        },
 		"databaseSkuCapacity": {
 			"type": "int",
-			"defaultValue": 2,
+			"defaultValue": 1,
 			"allowedValues": [
+				1,
 				2,
 				4,
 				8,
@@ -13,12 +33,12 @@
 				32
 			],
 			"metadata": {
-				"description": "Azure database for PostgreSQL compute capacity in vCores (2,4,8,16,32)"
+				"description": "Azure database for PostgreSQL compute capacity in vCores (1,2,4,8,16,32)."
 			}
 		},
 		"databaseSkuName": {
 			"type": "string",
-			"defaultValue": "GP_Gen5_2",
+			"defaultValue": "B_Gen5_1",
 			"allowedValues": [
 				"GP_Gen5_2",
 				"GP_Gen5_4",
@@ -40,44 +60,12 @@
 		"databaseSkuSizeMB": {
 			"type": "int",
 			"allowedValues": [
-				102400,
-				51200
+				51200,
+				102400
 			],
 			"defaultValue": 51200,
 			"metadata": {
-				"description": "Azure database for PostgreSQL Sku Size "
-			}
-		},
-		"databaseSkuTier": {
-			"type": "string",
-			"defaultValue": "GeneralPurpose",
-			"allowedValues": [
-				"GeneralPurpose",
-				"MemoryOptimized",
-				"Basic"
-			],
-			"metadata": {
-				"description": "Azure database for PostgreSQL pricing tier"
-			}
-		},
-		"postgresqlVersion": {
-			"type": "string",
-			"allowedValues": [
-				"9.5",
-				"9.6",
-				"10",
-				"11"
-			],
-			"defaultValue": "11",
-			"metadata": {
-				"description": "PostgreSQL version"
-			}
-		},
-		"databaseskuFamily": {
-			"type": "string",
-			"defaultValue": "Gen5",
-			"metadata": {
-				"description": "Azure database for PostgreSQL sku family"
+				"description": "Azure database for PostgreSQL Sku Size."
 			}
 		},
 		"skuName": {
@@ -103,21 +91,20 @@
 			"defaultValue": 1,
 			"minValue": 1,
 			"metadata": {
-				"description": "Describes plan's instance count"
+				"description": "Describes plan's instance count."
 			}
 		},
 		"administratorLogin": {
 			"type": "string",
-			"defaultValue": "Simon",
+			"defaultValue": "myadmin",
 			"metadata": {
-				"description": "The admin user of the PostgreSQL Server"
+				"description": "The admin user of the PostgreSQL Server."
 			}
 		},
 		"administratorLoginPassword": {
 			"type": "securestring",
-			"defaultValue": "HappyNewYear2020",
 			"metadata": {
-				"description": "The password of the admin user of the PostgreSQL Server"
+				"description": "The password of the admin user of the PostgreSQL Server."
 			}
 		},
 		"cacheSKUName": {
@@ -131,17 +118,7 @@
 				"description": "The pricing tier of the new Azure Redis Cache."
 			}
 		},
-		"cacheSKUFamily": {
-			"type": "string",
-			"allowedValues": [
-				"C"
-			],
-			"defaultValue": "C",
-			"metadata": {
-				"description": "The family for the sku."
-			}
-		},
-		"cacheSKUCapacity": {
+		"cacheSkuCapacity": {
 			"type": "int",
 			"allowedValues": [
 				0,
@@ -154,22 +131,43 @@
 			],
 			"defaultValue": 1,
 			"metadata": {
-				"description": "The size of the new Azure Redis Cache instance. "
+				"description": "The size of the new Azure Redis Cache instance."
+			}
+		},
+		"githubClientID": {
+			"type": "string",
+			"metadata": {
+				"description": "The GitHub Application Client ID."
+			}
+		},
+		"githubClientSecret": {
+			"type": "string",
+			"metadata": {
+				"description": "The GitHub Application Client Secret."
+			}
+		},
+		"nonStaffGithubAdminIDS": {
+			"type": "string",
+			"metadata": {
+				"description": "GitHub user_ids of users to be granted staff level access."
 			}
 		},
 		"location": {
 			"type": "string",
-			"defaultValue": "UK South",
+			"defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Location for all resources."
 			}
 		}
 	},
 	"variables": {
-		"hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
-		"webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-		"pgserverName": "[concat('pgserver', uniqueString(resourceGroup().id))]",
-		"cacheName": "[concat('cache', uniqueString(resourceGroup().id))]"
+		"hostingPlanName": "[concat('hpn-', uniqueString(resourceGroup().id))]",
+		"pgserverName": "[concat('psql-', uniqueString(resourceGroup().id))]",
+		"cacheName": "[concat('redis-', uniqueString(resourceGroup().id))]",
+		"postgresqlVersion": "11",
+		"databaseSkuFamily": "Gen5",
+		"cacheSkuFamily": "C",
+		"secretKeyBase": "[uniqueString(resourceGroup().id)]"
 	},
 	"resources": [
 		{
@@ -180,9 +178,9 @@
 			"properties": {
 				"enableNonSslPort": true,
 				"sku": {
-					"name": "[parameters('cacheSKUName')]",
-					"family": "[parameters('cacheSKUFamily')]",
-					"capacity": "[parameters('cacheSKUCapacity')]"
+					"name": "[parameters('cacheSkuName')]",
+					"family": "[variables('cacheSkuFamily')]",
+					"capacity": "[parameters('cacheSkuCapacity')]"
 				}
 			}
 		},
@@ -196,13 +194,13 @@
 				"tier": "[parameters('databaseSkuTier')]",
 				"capacity": "[parameters('databaseSkucapacity')]",
 				"size": "[parameters('databaseSkuSizeMB')]",
-				"family": "[parameters('databaseskuFamily')]"
+				"family": "[variables('databaseSkuFamily')]"
 			},
 			"resources": [
 				{
 					"type": "firewallRules",
 					"apiVersion": "2017-12-01",
-					"name": "[concat(variables('pgserverName'),'firewall')]",
+					"name": "AllowAzureIPs",
 					"dependsOn": [
 						"[concat('Microsoft.DBforPostgreSQL/servers/', variables('pgserverName'))]"
 					],
@@ -213,7 +211,7 @@
 				}
 			],
 			"properties": {
-				"version": "[parameters('postgresqlVersion')]",
+				"version": "[variables('postgresqlVersion')]",
 				"createMode": "Default",
 				"administratorLogin": "[parameters('administratorLogin')]",
 				"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
@@ -237,8 +235,8 @@
 		{
 			"type": "Microsoft.Web/sites",
 			"apiVersion": "2019-08-01",
-			"name": "[variables('webSiteName')]",
-			"location": "UK South",
+			"name": "[parameters('webSiteName')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
 				"[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
 				"[concat('Microsoft.Cache/Redis/', variables('cacheName'))]",
@@ -280,19 +278,19 @@
 						},
 						{
 							"name": "CLASSROOM_WEBHOOK_URL_PREFIX",
-							"value": "[concat('https://', variables('webSiteName'),'.azurewebsites.net')]"
+							"value": "[concat('https://',parameters('webSiteName'),'.azurewebsites.net')]"
 						},
 						{
 							"name": "GITHUB_CLIENT_ID",
-							"value": "a4465269281372be0fec"
+							"value": "[parameters('githubClientID')]"
 						},
 						{
 							"name": "GITHUB_CLIENT_SECRET",
-							"value": "6441c69bbf45fa9d4bc7fde728afd743abcad7e5"
+							"value": "[parameters('githubClientSecret')]"
 						},
 						{
 							"name": "NON_STAFF_GITHUB_ADMIN_IDS",
-							"value": "9089981"
+							"value": "[parameters('nonStaffGithubAdminIDS')]"
 						},
 						{
 							"name": "RACK_ENV",
@@ -312,7 +310,7 @@
 						},
 						{
 							"name": "SECRET_KEY_BASE",
-							"value": "4433100e069310220851c7c277a5fc419a45bcbe87bb04a6868662eddc5e07ab00ad6f1fedd66093ecd54d3cbf237566f6ef21fac0c9c4b32a5011d79c000017"
+							"value": "[variables('secretKeyBase')]"
 						},
 						{
 							"name": "WEBSITE_ENABLE_SYNC_UPDATE_SITE",
